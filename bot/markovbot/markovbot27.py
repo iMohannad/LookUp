@@ -26,8 +26,10 @@ import copy
 import time
 import pickle
 import random
+import json
 from threading import Thread, Lock
 from multiprocessing import Queue
+
 
 # external imports
 # Twitter package: https://pypi.python.org/pypi/twitter
@@ -872,6 +874,15 @@ class MarkovBot():
 						self._message(u'_autoreply', \
 							u'Failed to report on new Tweet :(')
 					
+					
+					flag = True
+					if !tweet[u'geo_enabled']:
+						flag = False
+
+						
+
+					
+
 					# Don't reply to this bot's own tweets
 					if tweet[u'user'][u'id_str'] == self._credentials[u'id_str']:
 						# Skip one cycle, which will bring us to the
@@ -1074,9 +1085,10 @@ class MarkovBot():
 
 					# Construct a new tweet using the database.
 					else:
+						# Find use API to find a word
 						response = self._construct_tweet( \
 							database=database, seedword=seedword, \
-							prefix=prefix, suffix=suffix)
+							prefix=prefix, suffix=suffix, flag=flag)
 
 					# Acquire the twitter lock
 					self._tlock.acquire(True)
@@ -1100,6 +1112,8 @@ class MarkovBot():
 					
 					# Wait for the minimal tweeting delay.
 					time.sleep(60.0*self._mindelay)
+
+
 	
 	
 	def _autotweet(self):
@@ -1316,7 +1330,7 @@ class MarkovBot():
 
 	
 	def _construct_tweet(self, database=u'default', seedword=None, \
-		prefix=None, suffix=None):
+		prefix=None, suffix=None, flag=flag):
 		
 		"""Constructs a text for a tweet, based on the current Markov chain.
 		The text will be of a length of 140 characters or less, and will
@@ -1354,6 +1368,9 @@ class MarkovBot():
 		response = u''
 		while response == u'' or len(response) > 140:
 			# Generate some random text
+			""" NEED TO BE CHANGED BASED ON THE API """
+			if(flag):
+
 			response = self.generate_text(sl, seedword=seedword, \
 				database=database, verbose=False, maxtries=100)
 			# Add the prefix

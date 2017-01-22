@@ -43,7 +43,7 @@ def process_res(res):
     print(u'LUIS Response: ')
     print(u'Query: ' + res.get_query())
     print(u'Top Scoring Intent: ' + res.get_top_intent().get_name())
-    if res.get_dialog() is not None:
+    """if res.get_dialog() is not None:
         if res.get_dialog().get_prompt() is None:
             print(u'Dialog Prompt: None')
         else:
@@ -52,15 +52,19 @@ def process_res(res):
             print(u'Dialog Parameter: None')
         else:
             print('Dialog Parameter Name: ' + res.get_dialog().get_parameter_name())
-        print(u'Dialog Status: ' + res.get_dialog().get_status())
+        print(u'Dialog Status: ' + res.get_dialog().get_status())"""
     print(u'Entities:')
     for entity in res.get_entities():
         print(u'"%s":' % entity.get_name())
         print(u'Type: %s, Score: %s' % (entity.get_type(), entity.get_score()))
 
-try:
-    APPID = raw_input(u'Please enter your app Id:\n')
-    APPKEY = raw_input(u'Please input your subscription key:\n')
+
+if __name__ == "__main__":
+    APPID = "0f47ca14-51ac-4ba9-800f-306aed6358f1"
+    APPKEY = "177f6a3716974bd2a614f80ad5b6128c"
+
+
+
     TEXT = raw_input(u'Please input the text to predict:\n')
     CLIENT = LUISClient(APPID, APPKEY, True)
     res = CLIENT.predict(TEXT)
@@ -68,5 +72,3 @@ try:
         TEXT = raw_input(u'%s\n'%res.get_dialog().get_prompt())
         res = CLIENT.reply(TEXT, res)
     process_res(res)
-except Exception, exc:
-    print(exc)
