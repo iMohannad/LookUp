@@ -39,7 +39,7 @@ lookupbot.twitter_login(cons_key, cons_secret, access_token, access_token_secret
 ###  2. Reply to a certain target string, 
 ###     which the bot will use to track what happens on twitter
 	
-targetstring = "#TestingPython"
+targetstring = "#askYP"
 keywords = ['buy', 'purchase', 'find']
 prefix = None
 suffix = None
