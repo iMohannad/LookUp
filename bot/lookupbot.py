@@ -22,9 +22,9 @@ print(first_text)
 
 # ALL YOUR SECRET STUFF!
 # Consumer Key (API Key)
-cons_key = 'o13Psyqy8Jw28LWIH1v71Smdg'
+cons_key = 'Jh14k4ixIwZ56Mn5MnB1B2XgU'
 # Consumer Secret (API Secret)
-cons_secret = 'PkENLtilx54PYJBiJgPI9VnsevSA1p8Elg7F9YYZGANkpxXt6t'
+cons_secret = 'wBSbrsvwaMgNkNZFovvh5MoLnMyi4WEohr8EToiBHjkQByHLQ5'
 # Access Token
 access_token = '822860574635737094-ENAxZJWuWpyVPnUnbnvKgX3tQY38Urk'
 # Access Token Secret

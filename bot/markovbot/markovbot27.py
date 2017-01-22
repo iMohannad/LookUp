@@ -45,9 +45,9 @@ except:
 
 class API(object):
 
-    def __init__(self, longitude, latitude):
-        self.longitude = longitude
-        self.latitude = latitude
+    def __init__(self, center):
+        self.longitude = center[0]
+        self.latitude = center[1]
         self.data = {}
 
     def dataSetup(self, searchType, collection, what):
@@ -76,7 +76,7 @@ class textAnalytics(object):
 		self.APPKEY = APPKEY
 
 
-	def postData(self, text):
+	def postData(self, text, center):
 		headers = {
 			# Request headers
 			'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ class textAnalytics(object):
 		r = requests.post(url, data=json.dumps(body), headers=headers)
 
 		keyword = json.loads(r.text)[u'documents'][0][u'keyPhrases'][0]
-		test = API(45.475, -73.586)
+		test = API(center)
 		req = test.dataSetup("PROXIMITY", "MERCHANT", keyword)
 		print req
 
@@ -934,12 +934,17 @@ class MarkovBot():
 					except:
 						self._message(u'_autoreply', \
 							u'Failed to report on new Tweet :(')
-					
-					
-					analytics = textAnalytics('e4756db13169403c9244e90c001e4833')
-					r = analytics.postData(tweet[u'text'])
+									
+					coordinates1 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][0]
+					coordinates2 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][2]
 
+					center = ((coordinates1[0]+coordinates2[0])/2, (coordinates1[1]+coordinates2[1])/2)
 					
+
+					analytics = textAnalytics('e4756db13169403c9244e90c001e4833')
+					#Removing the hashtag from the tweet.
+					r = analytics.postData(tweet[u'text'].replace(self._targetstring,"",1), center)
+
 
 					# Don't reply to this bot's own tweets
 					if tweet[u'user'][u'id_str'] == self._credentials[u'id_str']:
