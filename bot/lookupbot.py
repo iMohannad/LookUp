@@ -22,9 +22,9 @@ print(first_text)
 
 # ALL YOUR SECRET STUFF!
 # Consumer Key (API Key)
-cons_key = 'Jh14k4ixIwZ56Mn5MnB1B2XgU'
+cons_key = 'ssJ9h3bw5IiwViz4atg1reX5r'
 # Consumer Secret (API Secret)
-cons_secret = 'wBSbrsvwaMgNkNZFovvh5MoLnMyi4WEohr8EToiBHjkQByHLQ5'
+cons_secret = 'iYT7d0kqEQgRf81caLXbFn6q6fYNTy2IAoz6To94D9rNJqho6L'
 # Access Token
 access_token = '822860574635737094-ENAxZJWuWpyVPnUnbnvKgX3tQY38Urk'
 # Access Token Secret
@@ -42,7 +42,7 @@ lookupbot.twitter_login(cons_key, cons_secret, access_token, access_token_secret
 targetstring = "#TestingPython"
 keywords = ['buy', 'purchase', 'find']
 prefix = None
-suffix = "#TestingPython"
+suffix = None
 maxconvdepth = None
 
 # Start auto-responding to tweets

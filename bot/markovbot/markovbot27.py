@@ -27,6 +27,9 @@ import time
 import pickle
 import random
 import json
+import urllib2
+
+import re
 import requests
 from threading import Thread, Lock
 from multiprocessing import Queue
@@ -46,9 +49,12 @@ except:
 class API(object):
 
     def __init__(self, center):
-        self.longitude = center[0]
-        self.latitude = center[1]
+        self.longitude = float(center[0])
+        self.latitude = float(center[1])
         self.data = {}
+        self.myjson = ""
+        print self.longitude
+        print self.latitude
 
     def dataSetup(self, searchType, collection, what):
         data = { "search":[{
@@ -66,7 +72,33 @@ class API(object):
         req = urllib2.Request('http://hackaton.ypcloud.io/search')
         req.add_header('Content-Type', 'application/json')
         response = urllib2.urlopen(req, json.dumps(self.data))
-        return response.read()
+        self.myjson = json.loads(response.read())
+        return self.myjson
+
+    def findMerchant(self):
+        merchantName = self.myjson[u'searchResult'][0][u'merchants'][0][u'businessNamesForDisplay'][0][u'text']
+        return merchantName
+
+    def findMerchantId(self):
+        try:
+            merchantId = self.myjson[u'searchResult'][0][u'merchants'][0][u'merchantId']
+            return merchantId
+        except KeyError:
+            return False
+        
+    def findMerchantAddress(self):
+        try:
+            merchantAddress = self.myjson[u'searchResult'][0][u'merchants'][0][u'address'][u'displayLine']
+            return merchantAddress
+        except KeyError:
+            return False
+        
+    def findMerchantMapURL(self):
+        try:
+            merchantMapURL = re.search(r"(http://www.yellowpages.ca/bus/[A-Za-z\t / -s .html]+)",str(self.myjson[u'searchResult'][0][u'merchants'][0]))
+            return merchantMapURL.group()[:len(merchantMapURL.group())-1]
+        except KeyError:
+            return False
 
 
 class textAnalytics(object):
@@ -97,8 +129,16 @@ class textAnalytics(object):
 
 		keyword = json.loads(r.text)[u'documents'][0][u'keyPhrases'][0]
 		test = API(center)
-		req = test.dataSetup("PROXIMITY", "MERCHANT", keyword)
-		print req
+		data = test.dataSetup("PROXIMITY", "MERCHANT", keyword)
+		test.req()
+		results = []
+		results.append(keyword)
+		results.append(test.findMerchant())
+		results.append(test.findMerchantMapURL())
+		results.append(test.findMerchantAddress())
+		print data
+
+		return results
 
 
 
@@ -578,7 +618,7 @@ class MarkovBot():
 	
 	def twitter_autoreply_start(self, targetstring, database=u'default',
 		keywords=None, prefix=None, suffix=None, maxconvdepth=None,
-		mindelay=1.5):
+		mindelay=0.5):
 		
 		"""Starts the internal Thread that replies to all tweets that match
 		the target string.
@@ -935,16 +975,17 @@ class MarkovBot():
 						self._message(u'_autoreply', \
 							u'Failed to report on new Tweet :(')
 									
+
 					coordinates1 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][0]
 					coordinates2 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][2]
 
-					center = ((coordinates1[0]+coordinates2[0])/2, (coordinates1[1]+coordinates2[1])/2)
+					center = [(coordinates1[0])/2, coordinates1[1]]
 					
 
 					analytics = textAnalytics('e4756db13169403c9244e90c001e4833')
 					#Removing the hashtag from the tweet.
 					r = analytics.postData(tweet[u'text'].replace(self._targetstring,"",1), center)
-
+					#.replace(self._targetstring,"",1)
 
 					# Don't reply to this bot's own tweets
 					if tweet[u'user'][u'id_str'] == self._credentials[u'id_str']:
@@ -1149,9 +1190,20 @@ class MarkovBot():
 					# Construct a new tweet using the database.
 					else:
 						# Find use API to find a word
-						response = self._construct_tweet( \
-							database=database, seedword=seedword, \
-							prefix=prefix, suffix=suffix)
+						
+						response = prefix
+						response += " "
+						response += r[0]
+						response += " can be found at "
+						response += r[1]
+						response += " "
+						response += r[2]
+						
+						if len(response) > 140:
+							response = response[:140]
+						#response = self._construct_tweet( \
+						#	database=database, seedword=seedword, \
+						#	prefix=prefix, suffix=suffix)
 
 					# Acquire the twitter lock
 					self._tlock.acquire(True)
@@ -1175,7 +1227,6 @@ class MarkovBot():
 					
 					# Wait for the minimal tweeting delay.
 					time.sleep(60.0*self._mindelay)
-
 
 	
 	
