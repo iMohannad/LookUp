@@ -27,6 +27,7 @@ import time
 import pickle
 import random
 import json
+import requests
 from threading import Thread, Lock
 from multiprocessing import Queue
 
@@ -40,6 +41,66 @@ try:
 except:
 	print(u"WARNING from Markovbot: Could not load the 'twitter' library, so Twitter functionality is not available.")
 	IMPTWITTER = False
+
+
+class API(object):
+
+    def __init__(self, longitude, latitude):
+        self.longitude = longitude
+        self.latitude = latitude
+        self.data = {}
+
+    def dataSetup(self, searchType, collection, what):
+        data = { "search":[{
+                   "searchType":str(searchType),
+                   "collection":str(collection),
+                    "what": str(what),
+                   "where":{
+                   "type":"GEO",
+                   "value":str(self.longitude)+","+str(self.latitude)}
+                   }]}
+        self.data = data
+        return data
+
+    def req(self):
+        req = urllib2.Request('http://hackaton.ypcloud.io/search')
+        req.add_header('Content-Type', 'application/json')
+        response = urllib2.urlopen(req, json.dumps(self.data))
+        return response.read()
+
+
+class textAnalytics(object):
+	"""docstring for textAnalytics"""
+	def __init__(self, APPKEY):
+		super(textAnalytics, self).__init__()
+		self.APPKEY = APPKEY
+
+
+	def postData(self, text):
+		headers = {
+			# Request headers
+			'Content-Type': 'application/json',
+			'Ocp-Apim-Subscription-Key': self.APPKEY,
+		}
+
+		body = {
+			"documents": [
+				{
+				"language": "en",
+				"id": "string",
+				"text": text
+				}
+			]
+		}
+		url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases'
+		r = requests.post(url, data=json.dumps(body), headers=headers)
+
+		keyword = json.loads(r.text)[u'documents'][0][u'keyPhrases'][0]
+		test = API(45.475, -73.586)
+		req = test.dataSetup("PROXIMITY", "MERCHANT", keyword)
+		print req
+
+
 
 
 class MarkovBot():
@@ -875,11 +936,8 @@ class MarkovBot():
 							u'Failed to report on new Tweet :(')
 					
 					
-					flag = True
-					if !tweet[u'geo_enabled']:
-						flag = False
-
-						
+					analytics = textAnalytics('e4756db13169403c9244e90c001e4833')
+					r = analytics.postData(tweet[u'text'])
 
 					
 
@@ -1088,7 +1146,7 @@ class MarkovBot():
 						# Find use API to find a word
 						response = self._construct_tweet( \
 							database=database, seedword=seedword, \
-							prefix=prefix, suffix=suffix, flag=flag)
+							prefix=prefix, suffix=suffix)
 
 					# Acquire the twitter lock
 					self._tlock.acquire(True)
@@ -1330,7 +1388,7 @@ class MarkovBot():
 
 	
 	def _construct_tweet(self, database=u'default', seedword=None, \
-		prefix=None, suffix=None, flag=flag):
+		prefix=None, suffix=None):
 		
 		"""Constructs a text for a tweet, based on the current Markov chain.
 		The text will be of a length of 140 characters or less, and will
@@ -1369,8 +1427,6 @@ class MarkovBot():
 		while response == u'' or len(response) > 140:
 			# Generate some random text
 			""" NEED TO BE CHANGED BASED ON THE API """
-			if(flag):
-
 			response = self.generate_text(sl, seedword=seedword, \
 				database=database, verbose=False, maxtries=100)
 			# Add the prefix
