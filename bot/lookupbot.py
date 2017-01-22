@@ -37,7 +37,7 @@ lookupbot.twitter_login(cons_key, cons_secret, access_token, access_token_secret
 ###  2. Reply to a certain target string, 
 ###     which the bot will use to track what happens on twitter
 	
-targetstring = "#TestingPython"
+targetstring = "#askYP"
 keywords = ['buy', 'purchase', 'find']
 prefix = None
 suffix = "#askYP"
@@ -46,3 +46,10 @@ maxconvdepth = None
 # Start auto-responding to tweets
 lookupbot.twitter_autoreply_start(targetstring, keywords=keywords, prefix=prefix
 	, suffix=suffix, maxconvdepth=maxconvdepth)
+
+
+count = 0
+while (count < 100):
+	count = count
+
+
