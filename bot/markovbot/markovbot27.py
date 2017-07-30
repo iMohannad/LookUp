@@ -49,8 +49,8 @@ except:
 class API(object):
 
     def __init__(self, center):
-        self.longitude = float(center[0])
-        self.latitude = float(center[1])
+        self.longitude = str(center[0])
+        self.latitude = str(center[1])
         self.data = {}
         self.myjson = ""
         print self.longitude
@@ -63,7 +63,7 @@ class API(object):
                     "what": str(what),
                    "where":{
                    "type":"GEO",
-                   "value":str(self.longitude)+","+str(self.latitude)}
+                   "value":str(self.latitude)+","+str(self.longitude)}
                    }]}
         self.data = data
         return data
@@ -128,6 +128,7 @@ class textAnalytics(object):
 		r = requests.post(url, data=json.dumps(body), headers=headers)
 
 		keyword = json.loads(r.text)[u'documents'][0][u'keyPhrases'][0]
+		print keyword
 		test = API(center)
 		data = test.dataSetup("PROXIMITY", "MERCHANT", keyword)
 		test.req()
@@ -974,17 +975,21 @@ class MarkovBot():
 					except:
 						self._message(u'_autoreply', \
 							u'Failed to report on new Tweet :(')
-									
-
-					coordinates1 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][0]
-					coordinates2 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][2]
-
-					center = [(coordinates1[0])/2, coordinates1[1]]
 					
+					flag = True			
+					try:
+						coordinates1 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][0]
+						coordinates2 = tweet[u'place'][u'bounding_box'][u'coordinates'][0][2]
 
-					analytics = textAnalytics('e4756db13169403c9244e90c001e4833')
+						#center = [coordinates1[0]/2, coordinates1[1]]
+						center = [45.49, -73.58]
+
+						analytics = textAnalytics('e4756db13169403c9244e90c001e4833')
 					#Removing the hashtag from the tweet.
-					r = analytics.postData(tweet[u'text'].replace(self._targetstring,"",1), center)
+						r = analytics.postData(tweet[u'text'].replace(self._targetstring,"",1), center)
+					except Exception, e:
+						flag = False
+					
 					#.replace(self._targetstring,"",1)
 
 					# Don't reply to this bot's own tweets
@@ -1190,17 +1195,20 @@ class MarkovBot():
 					# Construct a new tweet using the database.
 					else:
 						# Find use API to find a word
+						if flag:
+							response = prefix
+							response += " "
+							response += r[0]
+							response += " can be found at "
+							response += r[1]
+							response += " "
+							response += r[2]
 						
-						response = prefix
-						response += " "
-						response += r[0]
-						response += " can be found at "
-						response += r[1]
-						response += " "
-						response += r[2]
-						
-						if len(response) > 140:
-							response = response[:140]
+							if len(response) > 140:
+								response = response[:140]
+						else:
+							response = prefix
+							response += " You need to enable location on Twitter"
 						#response = self._construct_tweet( \
 						#	database=database, seedword=seedword, \
 						#	prefix=prefix, suffix=suffix)
@@ -1208,6 +1216,7 @@ class MarkovBot():
 					# Acquire the twitter lock
 					self._tlock.acquire(True)
 					# Reply to the incoming tweet
+					print response
 					try:
 						# Post a new tweet
 						resp = self._t.statuses.update(status=response,

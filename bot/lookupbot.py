@@ -22,13 +22,13 @@ print(first_text)
 
 # ALL YOUR SECRET STUFF!
 # Consumer Key (API Key)
-cons_key = 'ssJ9h3bw5IiwViz4atg1reX5r'
+cons_key = ''
 # Consumer Secret (API Secret)
-cons_secret = 'iYT7d0kqEQgRf81caLXbFn6q6fYNTy2IAoz6To94D9rNJqho6L'
+cons_secret = ''
 # Access Token
-access_token = '822860574635737094-ENAxZJWuWpyVPnUnbnvKgX3tQY38Urk'
+access_token = ''
 # Access Token Secret
-access_token_secret = 't4xEL6urtd8a9joWWiKy5yFOPGSJ3KW0UXzWa7f8nUcR0'
+access_token_secret = ''
 
 #Login to twitter
 lookupbot.twitter_login(cons_key, cons_secret, access_token, access_token_secret)
@@ -39,7 +39,7 @@ lookupbot.twitter_login(cons_key, cons_secret, access_token, access_token_secret
 ###  2. Reply to a certain target string, 
 ###     which the bot will use to track what happens on twitter
 	
-targetstring = "#askYP"
+targetstring = "#askYPP"
 keywords = ['buy', 'purchase', 'find']
 prefix = None
 suffix = None
